@@ -11,66 +11,6 @@ License: UW Owned
 // This gets you the URL of the plugin for super awesome things
 define( 'UWAUTH_PATH', plugin_dir_url(__FILE__) );
 
-// Include the options page
-// include 'uw-auth_options_page.php';
-// include 'uwhf_lib.php';
-
-// $debug = true;
-// if ($debug) {
-error_reporting(E_ALL);
-// }
-
-
-
-
-function nothing(){}
-
-function check_for_restrictions() {
-	if (check_blog_for_protection()) {
-		$current_user = wp_get_current_user();
-		if ( (0 == $current_user->ID) && !is_admin() ) {
-			// 402 - Not logged in
-			add_uwauth_headers();
-			echo "This page is protected, but you're not logged in";
-			echo "You are not authorized to view this page. Please log in now.";
-			?>
-			<a href="<?php echo wp_login_url( get_permalink() ); ?>">Login</a> <?php
-			echo "</body>";
-			exit;
-		} else {
-			if (in_array($current_user->user_login,get_authorized_users_for_page())) {
-				echo "Cool, you're authorized, cya";
-			} else {
-				// echo "$current_user->user_login not found in auth table! Cya!";
-				echo "You are not authorized to view this page.";
-				print "<br/>";
-				print_r (get_authorized_users_for_page());
-				print "<br/>";
-				print in_array($current_user->user_login, get_authorized_users_for_page(), true);
-				echo get_stylesheet();
-				print "<br/>";
-				echo UWAUTH_PATH;
-				exit;
-			}
-		}
-	}
-}
-
-function check_blog_for_protection() {
-	return true;
-}
-
-function get_authorized_users_for_page() {
-	return ["webtest", "nikky@washington.edu"];
-}
-
-function add_uwauth_headers() {
-	echo "<html><head><title>Protected Site</title><link rel=\"stylesheet\" href=\"";
-	echo UWAUTH_PATH;
-	echo "css/bootstrap.min.css\"/>";
-	echo "</head><body>";
-}
-
 function parse_raw_gws_string($string) {
 	$group_array = [];
 	foreach(explode(";",$string) as $group) {
@@ -82,7 +22,7 @@ function parse_raw_gws_string($string) {
 function get_gws_groups($user) {
 	$groups = get_user_meta($user->ID, '_gws_groups');
 	if ($groups) {
-		// Not sure why WP is serializing it in a
+		// Not sure why WP is serializing it in an array, but okay
 		return $groups[0];
 	} else {
 		return false;
@@ -122,10 +62,60 @@ function print_array_as_html_list($array) {
 }
 
 // http://codex.wordpress.org/Plugin_API/Action_Reference/wp_enqueue_scripts
-add_action('parse_request', 'nothing');
+// add_action('parse_request', 'nothing');
 add_action('wp_login', 'user_gws_groups', 10, 2);
 add_action('wp_login', 'user_last_login', 10, 2);
 add_action('show_user_profile', 'user_uwauth_profile');
 add_action('edit_user_profile', 'user_uwauth_profile');
+
+
+
+function nothing(){}
+
+// function check_for_restrictions() {
+// 	if (check_blog_for_protection()) {
+// 		$current_user = wp_get_current_user();
+// 		if ( (0 == $current_user->ID) && !is_admin() ) {
+// 			// 402 - Not logged in
+// 			add_uwauth_headers();
+// 			echo "This page is protected, but you're not logged in";
+// 			echo "You are not authorized to view this page. Please log in now.";
+//
+//		<a href="<?php echo wp_login_url( get_permalink() ); ">Login</a> <?php
+// 			echo "</body>";
+// 			exit;
+// 		} else {
+// 			if (in_array($current_user->user_login,get_authorized_users_for_page())) {
+// 				echo "Cool, you're authorized, cya";
+// 			} else {
+// 				// echo "$current_user->user_login not found in auth table! Cya!";
+// 				echo "You are not authorized to view this page.";
+// 				print "<br/>";
+// 				print_r (get_authorized_users_for_page());
+// 				print "<br/>";
+// 				print in_array($current_user->user_login, get_authorized_users_for_page(), true);
+// 				echo get_stylesheet();
+// 				print "<br/>";
+// 				echo UWAUTH_PATH;
+// 				exit;
+// 			}
+// 		}
+// 	}
+// }
+
+// function check_blog_for_protection() {
+// 	return true;
+// }
+
+// function get_authorized_users_for_page() {
+// 	return ["webtest", "nikky@washington.edu"];
+// }
+
+// function add_uwauth_headers() {
+// 	echo "<html><head><title>Protected Site</title><link rel=\"stylesheet\" href=\"";
+// 	echo UWAUTH_PATH;
+// 	echo "css/bootstrap.min.css\"/>";
+// 	echo "</head><body>";
+// }
 
 ?>
