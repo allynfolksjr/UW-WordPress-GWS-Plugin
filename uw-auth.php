@@ -11,6 +11,12 @@ License: UW Owned
 // This gets you the URL of the plugin for super awesome things
 define( 'UWAUTH_PATH', plugin_dir_url(__FILE__) );
 
+
+/*
+Takes a raw gws_group string and returns an
+array of groups.
+*/
+
 function parse_raw_gws_string($string) {
 	$group_array = [];
 	foreach(explode(";",$string) as $group) {
@@ -18,6 +24,12 @@ function parse_raw_gws_string($string) {
 	}
 	return $group_array;
 }
+
+
+/*
+Retrieves gws_groups stored in WP database for specified user.
+Returns array if true; false if no groups found.
+*/
 
 function get_gws_groups($user) {
 	$groups = get_user_meta($user->ID, '_gws_groups');
@@ -29,18 +41,24 @@ function get_gws_groups($user) {
 	}
 }
 
+/*
+Grabs the gws_groups string from shib and returns array of groups if true;
+false if not present.
+*/
+
 function user_gws_groups($user_login, $user) {
 	if ($_SERVER['gws_groups']) {
 		$groups = parse_raw_gws_string($_SERVER['gws_groups']);
 	} else {
-		$groups = "nil";
+		$groups = false;
 	}
 	update_user_meta($user->ID, '_gws_groups', $groups);
 }
 
-function user_last_login($user_login, $user) {
-	update_user_meta($user->ID, '_last_login', time() );
-}
+/*
+Displays information about groups user is in on profile page.
+*/
+
 function user_uwauth_profile($user) {
 	print "<h3>Your UW Groups WordPress Knows About</h3>";
 	$groups = get_gws_groups($user);
@@ -51,6 +69,9 @@ function user_uwauth_profile($user) {
 	}
 }
 
+/*
+Turns array into UL list
+*/
 
 function print_array_as_html_list($array) {
 	$list = "<ul>";
@@ -64,7 +85,6 @@ function print_array_as_html_list($array) {
 // http://codex.wordpress.org/Plugin_API/Action_Reference/wp_enqueue_scripts
 // add_action('parse_request', 'nothing');
 add_action('wp_login', 'user_gws_groups', 10, 2);
-add_action('wp_login', 'user_last_login', 10, 2);
 add_action('show_user_profile', 'user_uwauth_profile');
 add_action('edit_user_profile', 'user_uwauth_profile');
 
