@@ -73,7 +73,6 @@ function add_uwauth_headers() {
 
 function parse_raw_gws_string($string) {
 	$group_array = [];
-	print_r(explode(";",$string));
 	foreach(explode(";",$string) as $group) {
 		$group_array[] = explode(":",$group)[4];
 	}
@@ -81,7 +80,13 @@ function parse_raw_gws_string($string) {
 }
 
 function get_gws_groups($user) {
-	return get_user_meta($user->ID, '_gws_groups');
+	$groups = get_user_meta($user->ID, '_gws_groups');
+	if ($groups) {
+		// Not sure why WP is serializing it in a
+		return $groups[0];
+	} else {
+		return false;
+	}
 }
 
 function user_gws_groups($user_login, $user) {
@@ -96,10 +101,24 @@ function user_gws_groups($user_login, $user) {
 function user_last_login($user_login, $user) {
 	update_user_meta($user->ID, '_last_login', time() );
 }
-
 function user_uwauth_profile($user) {
 	print "<h3>Your UW Groups WordPress Knows About</h3>";
-	print_r(get_gws_groups($user));
+	$groups = get_gws_groups($user);
+	if ($groups) {
+		print print_array_as_html_list($groups);
+	} else {
+		print "<p>This user is not known in any current groups.</p>";
+	}
+}
+
+
+function print_array_as_html_list($array) {
+	$list = "<ul>";
+	foreach($array as $member) {
+		$list .= "<li>" . sanitize_text_field($member) . "</li>";
+	}
+	$list .= "</ul>";
+	return $list;
 }
 
 // http://codex.wordpress.org/Plugin_API/Action_Reference/wp_enqueue_scripts
@@ -107,5 +126,6 @@ add_action('parse_request', 'nothing');
 add_action('wp_login', 'user_gws_groups', 10, 2);
 add_action('wp_login', 'user_last_login', 10, 2);
 add_action('show_user_profile', 'user_uwauth_profile');
+add_action('edit_user_profile', 'user_uwauth_profile');
 
 ?>
