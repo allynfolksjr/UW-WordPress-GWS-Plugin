@@ -8,9 +8,14 @@ Author: Nikky Southerland; UW Information Technology
 License: UW Owned
 */
 
+
+
+
 // This gets you the URL of the plugin for super awesome things
 define( 'UWAUTH_PATH', plugin_dir_url(__FILE__) );
 
+
+include 'uw-auth_options_page.php';
 
 /*
 Takes a raw gws_group string and returns an
@@ -91,22 +96,11 @@ function print_array_as_html_list($array) {
 	return $list;
 }
 
-
-function debug_groups($user) {
-	$debug = "<div><ul>";
-	$debug .= "<li>u_blogsdev_test:" . in_group($user, "u_blogsdev_test") . "</li>";
-	$debug .= "<li>u_blogsdev_tekjhst:" . in_group($user, "u_blogsdev_tekjhkst") . "</li>";
-	$debug .= "</ul></div>";
-	print $debug;
-}
-
 // http://codex.wordpress.org/Plugin_API/Action_Reference/wp_enqueue_scripts
 // add_action('parse_request', 'nothing');
 add_action('wp_login', 'user_gws_groups', 10, 2);
 add_action('show_user_profile', 'user_uwauth_profile');
 add_action('edit_user_profile', 'user_uwauth_profile');
-add_action('show_user_profile', 'debug_groups');
-add_action('edit_user_profile', 'debug_groups');
 
 
 
