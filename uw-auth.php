@@ -40,6 +40,15 @@ function get_gws_groups($user) {
 		return false;
 	}
 }
+/*
+Returns true if user is in group; false if not.
+*/
+function in_group($user, $group) {
+	$groups = get_gws_groups($user);
+	return in_array($group, $groups);
+}
+
+
 
 /*
 Grabs the gws_groups string from shib and returns array of groups if true;
@@ -82,11 +91,22 @@ function print_array_as_html_list($array) {
 	return $list;
 }
 
+
+function debug_groups($user) {
+	$debug = "<div><ul>";
+	$debug .= "<li>u_blogsdev_test:" . in_group($user, "u_blogsdev_test") . "</li>";
+	$debug .= "<li>u_blogsdev_tekjhst:" . in_group($user, "u_blogsdev_tekjhkst") . "</li>";
+	$debug .= "</ul></div>";
+	print $debug;
+}
+
 // http://codex.wordpress.org/Plugin_API/Action_Reference/wp_enqueue_scripts
 // add_action('parse_request', 'nothing');
 add_action('wp_login', 'user_gws_groups', 10, 2);
 add_action('show_user_profile', 'user_uwauth_profile');
 add_action('edit_user_profile', 'user_uwauth_profile');
+add_action('show_user_profile', 'debug_groups');
+add_action('edit_user_profile', 'debug_groups');
 
 
 
