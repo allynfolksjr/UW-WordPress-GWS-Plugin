@@ -55,6 +55,7 @@ function in_group($user, $group) {
 
 
 
+
 /*
 Grabs the gws_groups string from shib and returns array of groups if true;
 false if not present.
@@ -67,6 +68,60 @@ function user_gws_groups($user_login, $user) {
 		$groups = false;
 	}
 	update_user_meta($user->ID, '_gws_groups', $groups);
+}
+
+/*
+Upon login, will load all of a user's blogs and map their current groups
+to any defined roels on blogs.
+*/
+
+function map_groups_to_roles() {
+	$current_user = wp_get_current_user();
+	// print_r($current_user);
+	if ( is_multisite() ) {
+		print $current_user->ID;
+		$user_blogs = get_blog_ids_of_user_blogs($current_user);
+		foreach($user_blogs as $blog) {
+			switch_to_blog($blog);
+			update_option('gws_group_role_editor','u_nikky_employees_and_students');
+			bloginfo();
+			print "<br/>";
+			if ( ! isset( $wp_roles ) ) {
+				$wp_roles = new WP_Roles();
+			}
+			foreach(array_keys(($wp_roles->get_names())) as $role) {
+				print "<li>" . $role . ": ";
+				$group = get_option('gws_group_role_' . $role);
+				if ($group) {
+					print "Mapped to " . get_option('gws_group_role_' . $role);
+					print "<ul>";
+					print "<li>";
+					print_r(wp_update_user(array ('ID' => $current_user->ID,'role' => $role)));
+					print "Role changed</li></ul>";
+				} else {
+					print "not mapped";
+				}
+				print "</li>";
+			}
+			restore_current_blog();
+
+}		// get list of users's blogs and do nasty things
+	} else {
+		// Pull directly from main blog
+	}
+}
+
+/*
+Return an array of the blog IDs that a user is a member of
+*/
+
+function get_blog_ids_of_user_blogs($current_user) {
+	$user_blogs = [];
+	$user_blog_objects = get_blogs_of_user($current_user->ID);
+	foreach ($user_blog_objects as $blog) {
+		$user_blogs[] = $blog->userblog_id;
+	}
+	return $user_blogs;
 }
 
 /*
@@ -98,7 +153,8 @@ function print_array_as_html_list($array) {
 
 // http://codex.wordpress.org/Plugin_API/Action_Reference/wp_enqueue_scripts
 // add_action('parse_request', 'nothing');
-add_action('wp_login', 'user_gws_groups', 10, 2);
+add_action('wp_login', 'user_gws_groups', 2, 2);
+add_action('wp_login', 'map_groups_to_roles', 4);
 add_action('show_user_profile', 'user_uwauth_profile');
 add_action('edit_user_profile', 'user_uwauth_profile');
 

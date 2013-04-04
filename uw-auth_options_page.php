@@ -22,7 +22,23 @@ function debug_groups() {
     }
   }
   $debug .= "</ul>";
-  $debug .= "<h3>Your Roles on this current blog</h3>";
+  $debug .= "<h3>Your (Selected) Capabilities on this current blog prior to mucking</h3>";
+  $testing_roles = ["manage_network", "activate_plugins", "moderate_comments", "edit_published_posts", "edit_posts", "read" ];
+  foreach($testing_roles as $role) {
+    $debug .= "<li>" . $role . ": ";
+    if (current_user_can($role)) {
+      $debug .= "<strong>True</strong>";
+    } else {
+      $debug .= "<em>False</em>";
+    }
+  }
+  $debug .= "<h3>Checking the role options for this blog</h3>";
+  if ( ! isset( $wp_roles ) )
+    $wp_roles = new WP_Roles();
+  foreach(array_keys(($wp_roles->get_names())) as $role) {
+     $debug .= "<li>" . $role . "</li>";
+  }
+  $debug .= "<h3>Your Roles on this current blog after mucking about</h3>";
   $testing_roles = ["manage_network", "activate_plugins", "moderate_comments", "edit_published_posts", "edit_posts", "read" ];
   foreach($testing_roles as $role) {
     $debug .= "<li>" . $role . ": ";
@@ -37,7 +53,7 @@ function debug_groups() {
 }
 
 function uw_auth_dashboard_widget(){
-  wp_add_dashboard_widget('uw_auth_dashbaord_widget', 'UW Auth Testing Widget', 'uw_auth_dashboard_widget_function');
+  wp_add_dashboard_widget('uw_auth_dashboard_widget', 'UW Auth Testing Widget', 'uw_auth_dashboard_widget_function');
 }
 
 function uw_auth_dashboard_widget_function(){
