@@ -77,35 +77,23 @@ to any defined roels on blogs.
 
 function map_groups_to_roles() {
 	$current_user = wp_get_current_user();
-	// print_r($current_user);
 	if ( is_multisite() ) {
-		print $current_user->ID;
 		$user_blogs = get_blog_ids_of_user_blogs($current_user);
 		foreach($user_blogs as $blog) {
 			switch_to_blog($blog);
-			update_option('gws_group_role_editor','u_nikky_employees_and_students');
-			bloginfo();
-			print "<br/>";
 			if ( ! isset( $wp_roles ) ) {
 				$wp_roles = new WP_Roles();
 			}
 			foreach(array_keys(($wp_roles->get_names())) as $role) {
-				print "<li>" . $role . ": ";
 				$group = get_option('gws_group_role_' . $role);
 				if ($group) {
-					print "Mapped to " . get_option('gws_group_role_' . $role);
-					print "<ul>";
-					print "<li>";
-					print_r(wp_update_user(array ('ID' => $current_user->ID,'role' => $role)));
-					print "Role changed</li></ul>";
+					wp_update_user(array ('ID' => $current_user->ID,'role' => $role));
 				} else {
-					print "not mapped";
+						// Not mapped
 				}
-				print "</li>";
 			}
 			restore_current_blog();
-
-}		// get list of users's blogs and do nasty things
+		}
 	} else {
 		// Pull directly from main blog
 	}
