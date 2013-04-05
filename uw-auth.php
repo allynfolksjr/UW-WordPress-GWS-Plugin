@@ -71,6 +71,21 @@ function user_gws_groups($user_login, $user) {
 }
 
 /*
+Returns 'true' if requested role
+is a higher level; otherwise returns false
+*/
+
+function role_priority($current_role, $requested_role) {
+	$roles = ['subscriber','contributor','author','editor','administrator'];
+	if (array_search($current_role,$roles) > array_search($requested_role,$roles)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+/*
 Upon login, will load all of a user's blogs and map their current groups
 to any defined roels on blogs.
 */

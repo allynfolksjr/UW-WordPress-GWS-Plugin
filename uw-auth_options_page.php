@@ -1,9 +1,12 @@
 <?php
 
-add_action('admin_menu', 'uw_auth_menu');
+add_action('network_admin_menu', 'uw_auth_menu');
 
 function uw_auth_menu(){
-  add_options_page( 'UW Groups', 'UW Groups', 'manage_network', 'UW-Groups', 'uw_auth_options');
+  add_menu_page( 'UW Groups', 'UW Groups', 'manage_network', 'UW-Groups', 'uw_auth_options','./' . UWAUTH_PATH . 'img/favicon.ico');
+  add_submenu_page('UW-Groups','Settings', 'Settings','manage_network','Settings','blah');
+  add_submenu_page('UW-Groups','Diagnostics', 'Diagnostics','manage_network','Diagnostics','uw_auth_diagnostics');
+
 }
 
 
@@ -36,10 +39,17 @@ function debug_groups() {
   if ( ! isset( $wp_roles ) )
     $wp_roles = new WP_Roles();
   foreach(array_keys(($wp_roles->get_names())) as $role) {
-     $debug .= "<li>" . $role . "</li>";
+     $debug .= "<li>" . $role . ": ";
+     $mapped_group = get_option('gws_group_role_' . $role);
+     if ($mapped_group) {
+      $debug .= "Mapped to " . $mapped_group;
+     } else {
+      $debug .= "Managed by WordPress.";
+     }
+
+     $debug .= "</li>";
   }
   $debug .= "<h3>Your Roles on this current blog after mucking about</h3>";
-  $testing_roles = ["manage_network", "activate_plugins", "moderate_comments", "edit_published_posts", "edit_posts", "read" ];
   foreach($testing_roles as $role) {
     $debug .= "<li>" . $role . ": ";
     if (current_user_can($role)) {
@@ -52,6 +62,11 @@ function debug_groups() {
   print $debug;
 }
 
+
+/*
+Widget stuff
+*/
+
 function uw_auth_dashboard_widget(){
   wp_add_dashboard_widget('uw_auth_dashboard_widget', 'UW Auth Testing Widget', 'uw_auth_dashboard_widget_function');
 }
@@ -61,7 +76,7 @@ function uw_auth_dashboard_widget_function(){
 }
 add_action('wp_dashboard_setup', 'uw_auth_dashboard_widget');
 
-function uw_auth_options(){
+function uw_auth_diagnostics(){
 if ( !current_user_can( 'manage_network' ) )  {
     wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
   }
