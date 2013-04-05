@@ -16,6 +16,7 @@ define( 'UWAUTH_PATH', plugin_dir_url(__FILE__) );
 
 
 include 'uw-auth_options_page.php';
+include 'uw-auth_diagnostics_page.php';
 
 /*
 Takes a raw gws_group string and returns an
