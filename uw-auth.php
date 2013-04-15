@@ -2,7 +2,7 @@
 /*
 Plugin Name: UW <-> GWS Sync Plugin
 Plugin URI: http://staff.washington.edu/nikky
-Description: Authentication and restriction functionality
+Description: Map WordPress User Roles to UW Groups
 Version: 0.1.0
 Author: Nikky Southerland; UW Information Technology
 License: UW Owned

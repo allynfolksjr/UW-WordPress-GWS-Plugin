@@ -1,9 +1,5 @@
 <?php
 
-/*
-Widget stuff
-*/
-
 function uw_auth_dashboard_widget(){
   wp_add_dashboard_widget('uw_auth_dashboard_widget', 'UW Auth Testing Widget',
     'uw_auth_dashboard_widget_function');
